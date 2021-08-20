@@ -1,6 +1,7 @@
 package com.smkrevit.sqlitedatabase;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -25,15 +26,24 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
+    Cursor select(String sql) {
+        try {
+            return db.rawQuery(sql, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void makeTable() {
-        String tblcustomer = "CREATE TABLE \"tblcustomer\" (\n" +
+        String tblitems = "CCREATE TABLE \"tblitems\" (\n" +
                 "\t\"id\"\tINTEGER NOT NULL UNIQUE,\n" +
                 "\t\"name\"\tTEXT NOT NULL,\n" +
-                "\t\"address\"\tTEXT NOT NULL,\n" +
+                "\t\"stock\"\tINTEGER NOT NULL,\n" +
+                "\t\"price\"\tNUMERIC NOT NULL,\n" +
                 "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n" +
                 ");";
 
-        runSQL(tblcustomer);
+        runSQL(tblitems);
     }
 
     @Override
