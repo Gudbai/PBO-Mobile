@@ -47,7 +47,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.Edit:
-                                Toast.makeText(context, "Edit", Toast.LENGTH_SHORT).show();
+                                ((MainActivity)context).selectUpdate(itemList.get(position).getItem_id());
                                 break;
                             case R.id.Delete:
                                 ((MainActivity)context).deleteData(itemList.get(position).getItem_id());

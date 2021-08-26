@@ -1,9 +1,11 @@
 package com.smkrevit.sqlitedatabase;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     List<Item> itemData = new ArrayList<Item>();
     ItemAdapter adapter;
     RecyclerView rcvItem;
+
+    String itemID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,16 @@ public class MainActivity extends AppCompatActivity {
                     showMessage("Failed to insert data");
                 }
             } else {
-                showMessage("Data updated");
+                String sql = "UPDATE tblitems\n" +
+                        "SET name = '"+item+"', stock = '"+stock+"', price = '"+price+"'\n" +
+                        "WHERE id = "+itemID+" ;";
+
+                if (db.runSQL(sql)) {
+                    showMessage("Data update successful");
+                    selectData();
+                } else {
+                    showMessage("Data update failed");
+                }
             }
         }
 
@@ -101,12 +114,41 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteData(String id) {
         String item_id = id;
-        String sql = "DELETE FROM tblitems WHERE id = "+item_id+";";
-        if (db.runSQL(sql)) {
-            showMessage("Data deletion succeed");
-            selectData();
-        } else {
-            showMessage("Data deletion failed");
-        }
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("WARNING");
+        alert.setMessage("Are you sure you want to delete the data?");
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sql = "DELETE FROM tblitems WHERE id = "+item_id+";";
+                if (db.runSQL(sql)) {
+                    showMessage("Data deletion succeed");
+                    selectData();
+                } else {
+                    showMessage("Data deletion failed");
+                }
+            }
+        });
+
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+    }
+
+    public void selectUpdate(String id) {
+        itemID = id;
+        String sql = "SELECT * FROM tblitems WHERE id = "+id+" ;";
+        Cursor cursor = db.select(sql);
+        cursor.moveToNext();
+
+        etItem.setText(cursor.getString(cursor.getColumnIndex("name")));
+        etStock.setText(cursor.getString(cursor.getColumnIndex("stock")));
+        etPrice.setText(cursor.getString(cursor.getColumnIndex("price")));
+
+        tvChoice.setText("Update");
     }
 }
